@@ -1,4 +1,5 @@
 # feishu2md
+[![Golang - feishu2md](https://img.shields.io/github/go-mod/go-version/jedyang/feishu2md?color=%2376e1fe&logo=go)](https://go.dev/) [![Release](https://img.shields.io/github/v/release/jedyang/feishu2md?color=orange&logo=github)](https://github.com/jedyang/feishu2md/releases)
 
 这是一个下载飞书文档为 Markdown 文件的工具，使用 Go 语言实现。
 
