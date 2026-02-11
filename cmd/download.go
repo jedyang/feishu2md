@@ -9,9 +9,9 @@ import (
 	"sync"
 
 	"github.com/88250/lute"
-	"github.com/Wsine/feishu2md/core"
-	"github.com/Wsine/feishu2md/utils"
 	"github.com/chyroc/lark"
+	"github.com/jedyang/feishu2md/core"
+	"github.com/jedyang/feishu2md/utils"
 	"github.com/pkg/errors"
 )
 

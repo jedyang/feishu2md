@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Wsine/feishu2md/utils"
+	"github.com/jedyang/feishu2md/utils"
 )
 
 func TestCheckErr(t *testing.T) {

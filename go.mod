@@ -1,4 +1,4 @@
-module github.com/Wsine/feishu2md
+module github.com/jedyang/feishu2md
 
 go 1.24
 

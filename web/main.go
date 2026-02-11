@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Wsine/feishu2md/utils"
+	"github.com/jedyang/feishu2md/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Wsine/feishu2md/core"
+	"github.com/jedyang/feishu2md/core"
 )
 
 func getIdAndSecretFromEnv(t *testing.T) (string, string) {

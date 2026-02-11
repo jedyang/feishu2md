@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Wsine/feishu2md/utils"
+	"github.com/jedyang/feishu2md/utils"
 	"github.com/chyroc/lark"
 	"github.com/olekukonko/tablewriter"
 )
