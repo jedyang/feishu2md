@@ -97,7 +97,7 @@ USAGE:
    feishu2md download [command options] <url>
 
 OPTIONS:
-   --output value, -o value  Specify the output directory for the markdown files (default: "./")
+   --output value, -o value  指定输出的目录，默认是当前目录。windows系统下使用需要\\作为目录分隔符
    --dump                    Dump json response of the OPEN API (default: false)
    --batch                   Download all documents under a folder (default: false)
    --wiki                    Download all documents within the wiki. (default: false)
