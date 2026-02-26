@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/88250/lute"
+	"github.com/gin-gonic/gin"
 	"github.com/jedyang/feishu2md/core"
 	"github.com/jedyang/feishu2md/utils"
-	"github.com/gin-gonic/gin"
 )
 
 func downloadHandler(c *gin.Context) {
@@ -47,8 +47,8 @@ func downloadHandler(c *gin.Context) {
 	if docType == "wiki" {
 		node, err := client.GetWikiNodeInfo(ctx, docToken)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal error: client.GetWikiNodeInfo")
-			log.Panicf("error: %s", err)
+			c.String(http.StatusInternalServerError, "Internal error: client.GetWikiNodeInfo: "+err.Error())
+			log.Printf("error: %s", err)
 			return
 		}
 		docType = node.ObjType
@@ -61,8 +61,8 @@ func downloadHandler(c *gin.Context) {
 
 	docx, blocks, err := client.GetDocxContent(ctx, docToken)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Internal error: client.GetDocxContent")
-		log.Panicf("error: %s", err)
+		c.String(http.StatusInternalServerError, "Internal error: client.GetDocxContent: "+err.Error())
+		log.Printf("error: %s", err)
 		return
 	}
 	markdown = parser.ParseDocxContent(docx, blocks)
@@ -72,21 +72,21 @@ func downloadHandler(c *gin.Context) {
 	for _, imgToken := range parser.ImgTokens {
 		localLink, rawImage, err := client.DownloadImageRaw(ctx, imgToken, config.Output.ImageDir)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal error: client.DownloadImageRaw")
-			log.Panicf("error: %s", err)
+			c.String(http.StatusInternalServerError, "Internal error: client.DownloadImageRaw: "+err.Error())
+			log.Printf("error: %s", err)
 			return
 		}
 		markdown = strings.Replace(markdown, imgToken, localLink, 1)
 		f, err := writer.Create(localLink)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create")
-			log.Panicf("error: %s", err)
+			log.Printf("error: %s", err)
 			return
 		}
 		_, err = f.Write(rawImage)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create.Write")
-			log.Panicf("error: %s", err)
+			log.Printf("error: %s", err)
 			return
 		}
 	}
@@ -102,20 +102,20 @@ func downloadHandler(c *gin.Context) {
 		f, err := writer.Create(mdName)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create")
-			log.Panicf("error: %s", err)
+			log.Printf("error: %s", err)
 			return
 		}
 		_, err = f.Write([]byte(result))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create.Write")
-			log.Panicf("error: %s", err)
+			log.Printf("error: %s", err)
 			return
 		}
 
 		err = writer.Close()
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Close")
-			log.Panicf("error: %s", err)
+			log.Printf("error: %s", err)
 			return
 		}
 		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.zip"`, docToken))
