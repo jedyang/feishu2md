@@ -25,7 +25,7 @@ test:
 # Build Docker image
 build:
   stage: build
-  image: docker:latest
+  image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:latest
   services:
     - docker:dind
   script:
@@ -40,7 +40,7 @@ build:
 # Push to Harbor registry
 deploy:
   stage: deploy
-  image: docker:latest
+  image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:latest
   services:
     - docker:dind
   script:
