@@ -28,4 +28,3 @@ node_modules
 .next
 .vercel
 .vscode/**
-.gitlab-ci.yml
