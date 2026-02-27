@@ -28,7 +28,7 @@ build:
   stage: build
   image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5
   services:
-    - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:dind
+    - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5-dind
       alias: docker
       variables:
         HEALTHCHECK_TCP_PORT: "2375"
