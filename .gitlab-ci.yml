@@ -49,6 +49,8 @@ deploy:
   services:
     - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5-dind
       alias: docker
+      variables:
+        HEALTHCHECK_TCP_PORT: "2375"
   script:
     - echo "Pushing image to Harbor..."
     - docker push ${FULL_IMAGE_NAME}
