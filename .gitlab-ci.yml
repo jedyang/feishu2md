@@ -41,10 +41,6 @@ build:
     - docker build -t ${FULL_IMAGE_NAME} .
   only:
     - branches
-  artifacts:
-    paths:
-      - ./feishu2md4web
-    expire_in: 1 week
 
 # Push to Harbor registry
 deploy:
@@ -53,8 +49,6 @@ deploy:
   services:
     - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5-dind
   script:
-    - echo "Logging in to Harbor registry..."
-    - docker login -u ${HARBOR_USER} -p ${HARBOR_PASSWORD} ${HARBOR_REGISTRY}
     - echo "Pushing image to Harbor..."
     - docker push ${FULL_IMAGE_NAME}
     - echo "Deployment completed successfully!"
