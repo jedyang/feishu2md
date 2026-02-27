@@ -4,7 +4,7 @@ FROM golang:${GO_VERSION}-alpine AS builder
 WORKDIR /feishu2md
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN export GOPROXY=https://goproxy.cn,direct && go mod download
 
 COPY core  ./core
 COPY web ./web
