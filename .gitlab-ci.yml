@@ -24,7 +24,7 @@ variables:
 #     - branches
 
 # Build Docker image
-build:
+build-and-push:
   stage: build
   image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5
   services:
@@ -39,27 +39,6 @@ build:
     DOCKER_TLS_CERTDIR: ""
   script:
     - docker build -t ${FULL_IMAGE_NAME} .
-  only:
-    - branches
-
-# Push to Harbor registry
-deploy:
-  stage: deploy
-  image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5
-  services:
-    - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5-dind
-      alias: docker
-      variables:
-        HEALTHCHECK_TCP_PORT: "2375"
-  script:
-    - echo "Pushing image to Harbor..."
     - docker push ${FULL_IMAGE_NAME}
-    - echo "Deployment completed successfully!"
   only:
-    - main  # 只在main分支上部署
-  environment:
-    name: production
-  variables:
-    GIN_MODE: release
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    - main  # 只在main分支上构建和推送镜像
