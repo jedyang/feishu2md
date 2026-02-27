@@ -10,6 +10,8 @@ variables:
   HARBOR_REGISTRY: docker.cnb.cool  # 替换为你的Harbor仓库地址
   HARBOR_PROJECT: meyley/docker  # 替换为你的Harbor项目名称
   IMAGE_NAME: feishu2md
+  HARBOR_USER: cnb  # 替换为你的Harbor用户名
+  HARBOR_PASSWORD: 2Fk1199lQMwNyhtAQ3NW67XoK4B # 替换为你的Harbor密码
   IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
   FULL_IMAGE_NAME: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}
 # Run tests
@@ -39,6 +41,8 @@ build-and-push:
     DOCKER_TLS_CERTDIR: ""
   script:
     - docker build -t ${FULL_IMAGE_NAME} .
+    - echo "Pushing image to Harbor..."
+    - docker login -u ${HARBOR_USER} -p ${HARBOR_PASSWORD} ${HARBOR_REGISTRY}
     - docker push ${FULL_IMAGE_NAME}
   only:
     - main  # 只在main分支上构建和推送镜像
