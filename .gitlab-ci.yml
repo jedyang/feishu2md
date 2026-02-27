@@ -30,6 +30,10 @@ build:
   services:
     - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:dind
       alias: docker
+      variables:
+        HEALTHCHECK_TCP_PORT: "2375"
+  before_script:
+    - docker info
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
