@@ -29,6 +29,9 @@ build:
   image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:latest
   services:
     - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   script:
     - docker build -t ${FULL_IMAGE_NAME} .
   only:
@@ -56,3 +59,5 @@ deploy:
     name: production
   variables:
     GIN_MODE: release
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
