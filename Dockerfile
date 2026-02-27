@@ -12,7 +12,8 @@ COPY utils ./utils
 RUN go build -o ./feishu2md4web ./web/*.go
 
 FROM docker.cnb.cool/meyley/docker/alpine:latest
-RUN apk update && apk add --no-cache ca-certificates
+RUN apk update
+RUN apk add --no-cache ca-certificates
 
 ENV GIN_MODE=release
 
