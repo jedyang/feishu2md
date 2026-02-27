@@ -1,5 +1,5 @@
 ARG GO_VERSION=1.24
-FROM golang:${GO_VERSION}-alpine AS builder
+FROM docker.cnb.cool/meyley/docker/golang:${GO_VERSION}-alpine AS builder
 
 WORKDIR /feishu2md
 
@@ -11,7 +11,7 @@ COPY web ./web
 COPY utils ./utils
 RUN go build -o ./feishu2md4web ./web/*.go
 
-FROM alpine:latest
+FROM docker.cnb.cool/meyley/docker/alpine:latest
 RUN apk update && apk add --no-cache ca-certificates
 
 ENV GIN_MODE=release
