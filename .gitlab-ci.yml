@@ -51,7 +51,7 @@ deploy:
   stage: deploy
   image: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5
   services:
-    - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:dind
+    - name: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/docker:24.0.5-dind
   script:
     - echo "Logging in to Harbor registry..."
     - docker login -u ${HARBOR_USER} -p ${HARBOR_PASSWORD} ${HARBOR_REGISTRY}
