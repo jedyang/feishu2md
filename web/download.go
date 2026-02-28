@@ -27,6 +27,13 @@ func downloadHandler(c *gin.Context) {
 
 	// Get additional parameters
 	fileName := c.Query("fileName")
+	// URL decode fileName to handle Chinese characters
+	if fileName != "" {
+		decodedFileName, err := url.QueryUnescape(fileName)
+		if err == nil {
+			fileName = decodedFileName
+		}
+	}
 	enableCloudStorage := c.Query("enableCloudStorage") == "true"
 
 	// Validate the url to download
