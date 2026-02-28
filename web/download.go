@@ -27,13 +27,19 @@ func downloadHandler(c *gin.Context) {
 
 	// Get additional parameters
 	fileName := c.Query("fileName")
+	log.Printf("Original fileName: %s", fileName)
 	// URL decode fileName to handle Chinese characters
 	if fileName != "" {
-		decodedFileName, err := url.QueryUnescape(fileName)
-		if err == nil {
+		// Try to decode multiple times in case of double encoding
+		for i := 0; i < 3; i++ { // Maximum 3 decoding attempts
+			decodedFileName, err := url.QueryUnescape(fileName)
+			if err != nil || decodedFileName == fileName {
+				break
+			}
 			fileName = decodedFileName
 		}
 	}
+	log.Printf("Decoded fileName: %s", fileName)
 	enableCloudStorage := c.Query("enableCloudStorage") == "true"
 
 	// Validate the url to download
@@ -160,15 +166,18 @@ func downloadHandler(c *gin.Context) {
 		if fileName != "" {
 			zipName = fileName
 		}
-		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.zip"`, zipName))
-		c.Data(http.StatusOK, "application/octet-stream", zipBuffer.Bytes())
+		// Both formats must be URL encoded
+		// Use RFC 5987 with UTF-8 encoding
+		c.Header("Content-Disposition", "attachment; filename=\""+zipName+".zip\"; filename*=UTF-8''"+url.PathEscape(zipName+".zip"))
 	} else {
 		// Determine markdown filename
 		mdName := docToken
 		if fileName != "" {
 			mdName = fileName
 		}
-		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.md"`, mdName))
-		c.Data(http.StatusOK, "application/octet-stream", []byte(result))
+		log.Printf("mdName: %s", mdName)
+		// Both formats must be URL encoded
+		// Use RFC 5987 with UTF-8 encoding
+		c.Header("Content-Disposition", "attachment; filename=\""+mdName+".md\"; filename*=UTF-8''"+url.PathEscape(mdName+".md"))
 	}
 }
