@@ -169,6 +169,8 @@ func downloadHandler(c *gin.Context) {
 		// Both formats must be URL encoded
 		// Use RFC 5987 with UTF-8 encoding
 		c.Header("Content-Disposition", "attachment; filename=\""+zipName+".zip\"; filename*=UTF-8''"+url.PathEscape(zipName+".zip"))
+		c.Header("Content-Type", "application/zip")
+		c.Data(http.StatusOK, "application/zip", zipBuffer.Bytes())
 	} else {
 		// Determine markdown filename
 		mdName := docToken
@@ -179,5 +181,7 @@ func downloadHandler(c *gin.Context) {
 		// Both formats must be URL encoded
 		// Use RFC 5987 with UTF-8 encoding
 		c.Header("Content-Disposition", "attachment; filename=\""+mdName+".md\"; filename*=UTF-8''"+url.PathEscape(mdName+".md"))
+		c.Header("Content-Type", "text/markdown; charset=utf-8")
+		c.String(http.StatusOK, result)
 	}
 }
