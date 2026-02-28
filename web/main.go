@@ -26,7 +26,7 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.templ.html", nil)
 	})
-	router.GET("/download", downloadHandler)
+	router.GET("/feishu/download", downloadHandler)
 
 	if err := router.Run(); err != nil {
 		log.Panicf("error: %s", err)

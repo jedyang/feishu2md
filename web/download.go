@@ -25,6 +25,10 @@ func downloadHandler(c *gin.Context) {
 		return
 	}
 
+	// Get additional parameters
+	fileName := c.Query("fileName")
+	enableCloudStorage := c.Query("enableCloudStorage") == "true"
+
 	// Validate the url to download
 	docType, docToken, err := utils.ValidateDocumentURL(feishu_docx_url)
 	fmt.Println("Captured document token:", docToken)
@@ -35,6 +39,14 @@ func downloadHandler(c *gin.Context) {
 		os.Getenv("FEISHU_APP_ID"),
 		os.Getenv("FEISHU_APP_SECRET"),
 	)
+	// Load OSS config from environment variables
+	config.OSS.AccessKeyId = os.Getenv("OSS_ACCESS_KEY_ID")
+	config.OSS.AccessKeySecret = os.Getenv("OSS_ACCESS_KEY_SECRET")
+	config.OSS.BucketName = os.Getenv("OSS_BUCKET_NAME")
+	config.OSS.Endpoint = os.Getenv("OSS_ENDPOINT")
+	config.OSS.Region = os.Getenv("OSS_REGION")
+	config.OSS.Prefix = os.Getenv("OSS_PREFIX")
+
 	client := core.NewClient(
 		config.Feishu.AppId, config.Feishu.AppSecret,
 	)
@@ -70,24 +82,36 @@ func downloadHandler(c *gin.Context) {
 	zipBuffer := new(bytes.Buffer)
 	writer := zip.NewWriter(zipBuffer)
 	for _, imgToken := range parser.ImgTokens {
-		localLink, rawImage, err := client.DownloadImageRaw(ctx, imgToken, config.Output.ImageDir)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal error: client.DownloadImageRaw: "+err.Error())
-			log.Printf("error: %s", err)
-			return
-		}
-		markdown = strings.Replace(markdown, imgToken, localLink, 1)
-		f, err := writer.Create(localLink)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create")
-			log.Printf("error: %s", err)
-			return
-		}
-		_, err = f.Write(rawImage)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create.Write")
-			log.Printf("error: %s", err)
-			return
+		if enableCloudStorage {
+			// Upload to OSS
+			ossURL, err := client.UploadImageToOSS(ctx, imgToken, config.OSS)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal error: client.UploadImageToOSS: "+err.Error())
+				log.Printf("error: %s", err)
+				return
+			}
+			markdown = strings.Replace(markdown, imgToken, ossURL, 1)
+		} else {
+			// Download to local
+			localLink, rawImage, err := client.DownloadImageRaw(ctx, imgToken, config.Output.ImageDir)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal error: client.DownloadImageRaw: "+err.Error())
+				log.Printf("error: %s", err)
+				return
+			}
+			markdown = strings.Replace(markdown, imgToken, localLink, 1)
+			f, err := writer.Create(localLink)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create")
+				log.Printf("error: %s", err)
+				return
+			}
+			_, err = f.Write(rawImage)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create.Write")
+				log.Printf("error: %s", err)
+				return
+			}
 		}
 	}
 
@@ -98,7 +122,12 @@ func downloadHandler(c *gin.Context) {
 
 	// Set response
 	if len(parser.ImgTokens) > 0 {
+		// Determine markdown filename
 		mdName := fmt.Sprintf("%s.md", docToken)
+		if fileName != "" {
+			mdName = fmt.Sprintf("%s.md", fileName)
+		}
+
 		f, err := writer.Create(mdName)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal error: zipWriter.Create")
@@ -118,10 +147,21 @@ func downloadHandler(c *gin.Context) {
 			log.Printf("error: %s", err)
 			return
 		}
-		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.zip"`, docToken))
+
+		// Determine zip filename
+		zipName := docToken
+		if fileName != "" {
+			zipName = fileName
+		}
+		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.zip"`, zipName))
 		c.Data(http.StatusOK, "application/octet-stream", zipBuffer.Bytes())
 	} else {
-		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.md"`, docToken))
+		// Determine markdown filename
+		mdName := docToken
+		if fileName != "" {
+			mdName = fileName
+		}
+		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.md"`, mdName))
 		c.Data(http.StatusOK, "application/octet-stream", []byte(result))
 	}
 }

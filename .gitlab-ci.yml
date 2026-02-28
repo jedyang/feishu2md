@@ -1,9 +1,8 @@
 # GitLab CI/CD configuration for feishu2md project
 
 stages:
-  - test
+  # - test
   - build
-  - deploy
 
 variables:
   # Harbor repository settings
