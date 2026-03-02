@@ -28,7 +28,7 @@ func downloadHandler(c *gin.Context) {
 	// Get additional parameters
 	fileName := c.Query("fileName")
 	log.Printf("Original fileName: %s", fileName)
-	// URL decode fileName to handle Chinese characters
+	// 这段代码执行3次循环的目的是为了处理 双重编码 的情况。
 	if fileName != "" {
 		// Try to decode multiple times in case of double encoding
 		for i := 0; i < 3; i++ { // Maximum 3 decoding attempts
@@ -134,7 +134,8 @@ func downloadHandler(c *gin.Context) {
 	result := engine.FormatStr("md", markdown)
 
 	// Set response
-	if len(parser.ImgTokens) > 0 {
+	if len(parser.ImgTokens) > 0 && !enableCloudStorage {
+		// Only use zip when there are images and cloud storage is not enabled
 		// Determine markdown filename
 		mdName := fmt.Sprintf("%s.md", docToken)
 		if fileName != "" {
@@ -172,6 +173,7 @@ func downloadHandler(c *gin.Context) {
 		c.Header("Content-Type", "application/zip")
 		c.Data(http.StatusOK, "application/zip", zipBuffer.Bytes())
 	} else {
+		// When cloud storage is enabled or no images, return markdown file directly
 		// Determine markdown filename
 		mdName := docToken
 		if fileName != "" {
